@@ -8,16 +8,18 @@ const SORT_OPTIONS = [
 
 const CategoryFilter = ({ onCategoryChange, activeCategory, onSortChange, activeSort = "relevance" }) => {
   return (
-    <section className="mb-stack-lg">
-      {/* Section heading + Sort dropdown */}
-      <div className="flex items-center justify-between mb-stack-md">
-        <h2 className="font-headline-md text-headline-md">Explore Products</h2>
+    <section className="mb-md space-y-sm">
+      <div className="flex justify-between items-center">
+        <h3 className="font-headline-md text-headline-md text-on-surface"
+          style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+          Explore Products
+        </h3>
         <div className="relative">
-          <span className="material-symbols-outlined absolute left-2 top-1/2 -translate-y-1/2 text-secondary text-[18px] pointer-events-none">sort</span>
+          <span className="material-symbols-outlined absolute left-2 top-1/2 -translate-y-1/2 text-primary text-[18px] pointer-events-none">filter_list</span>
           <select
             value={activeSort}
             onChange={(e) => onSortChange && onSortChange(e.target.value)}
-            className="pl-8 pr-3 py-1.5 rounded-lg border border-outline-variant font-label-sm text-label-sm text-on-surface bg-white focus:outline-none focus:border-secondary appearance-none cursor-pointer"
+            className="pl-8 pr-3 py-1.5 rounded-lg border border-outline-variant font-label-md text-label-md text-on-surface bg-surface-container-lowest focus:outline-none focus:border-primary appearance-none cursor-pointer"
           >
             {SORT_OPTIONS.map((o) => (
               <option key={o.value} value={o.value}>{o.label}</option>
@@ -26,17 +28,19 @@ const CategoryFilter = ({ onCategoryChange, activeCategory, onSortChange, active
         </div>
       </div>
 
-      {/* Category scroll row */}
-      <div className="flex gap-3 overflow-x-auto hide-scrollbar -mx-margin-mobile px-margin-mobile">
+      <div className="flex gap-2 overflow-x-auto pb-2 -mx-margin-mobile px-margin-mobile hide-scrollbar">
         {CATEGORIES.map((cat) => (
           <button
             key={cat}
             onClick={() => onCategoryChange && onCategoryChange(cat)}
-            className={`whitespace-nowrap font-label-sm text-label-sm px-5 py-2 rounded-full transition-all ${
+            className={`whitespace-nowrap font-label-md text-label-md px-6 py-2 rounded-full transition-all duration-200 ${
               activeCategory === cat
-                ? "bg-secondary text-on-secondary"
-                : "bg-surface-container-low text-on-surface-variant hover:bg-surface-container"
+                ? "text-white"
+                : "bg-surface-container-highest/50 text-on-surface-variant hover:bg-surface-variant"
             }`}
+            style={activeCategory === cat
+              ? { backgroundColor: "#4648d4", boxShadow: "0 4px 12px rgba(70,72,212,0.3)" }
+              : {}}
           >
             {cat}
           </button>

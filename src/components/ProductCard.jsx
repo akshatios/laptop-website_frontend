@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import apiFetch from "../utils/apiFetch";
 
-const API = import.meta.env.VITE_API_BASE_URL;
 const getToken = () => localStorage.getItem("token") || sessionStorage.getItem("token");
 
 const ProductCard = ({ product, onAddToCart, initialSaved = false }) => {
@@ -17,9 +17,8 @@ const ProductCard = ({ product, onAddToCart, initialSaved = false }) => {
     if (!token) { navigate("/login?redirect=saved"); return; }
     setLoading(true);
     try {
-      const method = saved ? "DELETE" : "POST";
-      await fetch(`${API}/api/auth/favorites/${id}`, {
-        method,
+      await apiFetch(`/api/auth/favorites/${id}`, {
+        method: saved ? "DELETE" : "POST",
         headers: { Authorization: `Bearer ${token}` },
       });
       setSaved(!saved);
@@ -27,49 +26,76 @@ const ProductCard = ({ product, onAddToCart, initialSaved = false }) => {
     setLoading(false);
   };
 
-  const badgeClasses =
-    status === "SOLD"
-      ? "bg-error-container text-on-error-container"
-      : "bg-secondary/10 text-secondary";
+  const isSold = status === "SOLD";
 
   return (
-    <div onClick={() => navigate(`/product/${id}`)} className="bg-white rounded-xl overflow-hidden shadow-[0px_4px_20px_rgba(15,23,42,0.05)] border border-outline-variant group flex flex-col cursor-pointer">
-      <div className="aspect-square bg-surface-container-low relative flex items-center justify-center overflow-hidden">
-        <img src={image} alt={title} className="w-4/5 h-4/5 object-contain group-hover:scale-110 transition-transform duration-500" loading="lazy" />
+    <div
+      onClick={() => navigate(`/product/${id}`)}
+      className="group flex flex-col bg-surface-container-lowest rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1 cursor-pointer"
+    >
+      {/* Image area */}
+      <div className="relative aspect-square w-full bg-surface-container p-3">
+        {/* Condition badge */}
         {condition && (
-          <span className={`absolute top-2 left-2 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider ${badgeClasses}`}>
-            {condition}
-          </span>
+          <div className="absolute top-2 left-2 z-10 px-2 py-0.5 rounded-md shadow-sm"
+            style={{ background: "rgba(57,184,253,0.9)", backdropFilter: "blur(4px)" }}>
+            <span className="font-label-sm text-label-sm text-on-secondary-container tracking-wider uppercase">
+              {condition}
+            </span>
+          </div>
         )}
+
+        {/* Sold overlay */}
+        {isSold && (
+          <div className="absolute inset-0 z-10 flex items-center justify-center rounded-xl"
+            style={{ background: "rgba(186,26,26,0.15)", backdropFilter: "blur(2px)" }}>
+            <span className="bg-error text-on-error font-label-md text-label-md px-3 py-1 rounded-full">SOLD</span>
+          </div>
+        )}
+
+        {/* Favorite button */}
         <button
           onClick={handleFavorite}
           disabled={loading}
-          className="absolute top-2 right-2 bg-white rounded-full p-1 shadow transition-transform hover:scale-110 disabled:opacity-60"
+          className="absolute top-2 right-2 z-10 w-8 h-8 flex items-center justify-center rounded-full shadow-sm transition-colors disabled:opacity-60"
+          style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(12px)" }}
         >
-          <span
-            className="material-symbols-outlined text-[20px]"
-            style={{ color: saved ? "#e53935" : "#76777d", fontVariationSettings: saved ? "'FILL' 1" : "'FILL' 0" }}
-          >
+          <span className="material-symbols-outlined text-[20px]"
+            style={{
+              color: saved ? "#e53935" : "#4648d4",
+              fontVariationSettings: saved ? "'FILL' 1" : "'FILL' 0"
+            }}>
             favorite
           </span>
         </button>
+
+        {/* Product image */}
+        <div className="w-full h-full rounded-xl overflow-hidden flex items-center justify-center">
+          {image
+            ? <img src={image} alt={title}
+                className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
+                loading="lazy" />
+            : <span className="material-symbols-outlined text-outline text-[48px]">image</span>
+          }
+        </div>
       </div>
 
-      <div className="p-3 flex flex-col flex-1">
-        <h3 className="font-headline-md text-[15px] leading-tight text-on-surface mb-1 truncate">{title}</h3>
-        <div className="mt-auto flex items-end justify-between gap-2">
-          <span className="font-price-display text-price-display text-secondary">
+      {/* Info area */}
+      <div className="p-3 space-y-1">
+        <h4 className="font-label-md text-label-md text-on-surface line-clamp-1">{title}</h4>
+        <div className="flex items-center justify-between">
+          <span className="font-headline-md text-headline-md text-primary">
             ₹{parseFloat(price).toLocaleString("en-IN")}
           </span>
-          {onAddToCart && (
-            <button
-              onClick={onAddToCart}
-              className="hidden md:flex items-center gap-1 text-[12px] font-semibold bg-secondary text-white px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 shrink-0"
-            >
-              <span className="material-symbols-outlined text-[14px]">add_shopping_cart</span>
-              Add
-            </button>
-          )}
+          <button
+            onClick={(e) => { e.stopPropagation(); onAddToCart && onAddToCart(); }}
+            className="w-8 h-8 flex items-center justify-center rounded-full transition-all active:scale-90"
+            style={{ background: "rgba(70,72,212,0.1)", color: "#4648d4" }}
+            onMouseEnter={e => { e.currentTarget.style.background = "#4648d4"; e.currentTarget.style.color = "#fff"; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "rgba(70,72,212,0.1)"; e.currentTarget.style.color = "#4648d4"; }}
+          >
+            <span className="material-symbols-outlined text-[18px]">add_shopping_cart</span>
+          </button>
         </div>
       </div>
     </div>
