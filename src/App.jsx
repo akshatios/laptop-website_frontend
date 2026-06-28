@@ -13,7 +13,7 @@ const Layout = () => {
   return (
     <div className="bg-surface text-on-surface selection:bg-secondary-fixed selection:text-on-secondary-fixed">
       {!isDetailPage && <Header />}
-      <main className={isDetailPage ? "" : "pt-24 pb-stack-lg px-4 md:px-8 lg:px-16 max-w-7xl mx-auto w-full"}>
+      <main className={isDetailPage ? "" : "pt-4 pb-24 px-margin-mobile md:px-8 lg:px-16 max-w-container-max mx-auto w-full"}>
         <AppRoutes />
       </main>
       {!isDetailPage && <BottomNav />}

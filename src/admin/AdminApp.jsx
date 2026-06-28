@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import RouterProvider, { useRouter } from './context/RouterContext';
 import ToastProvider from './context/ToastContext';
 import AuthProvider, { useAuth } from './context/AuthContext';
@@ -43,7 +44,21 @@ function DashboardShell() {
 
 function AdminRoutes() {
   const { isAuth } = useAuth();
-  
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!isAuth) return;
+    // Replace current history entry with /admin so back goes nowhere useful
+    window.history.replaceState(null, '', '/admin');
+    // Push extra state so back button stays on /admin
+    window.history.pushState(null, '', '/admin');
+    const block = () => {
+      window.history.pushState(null, '', '/admin');
+      navigate('/admin', { replace: true });
+    };
+    window.addEventListener('popstate', block);
+    return () => window.removeEventListener('popstate', block);
+  }, [isAuth]);
   if (!isAuth) {
     return (
       <div style={{ height: '100vh', background: '#0f1117', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 16, fontFamily: 'Inter, sans-serif', color: '#7c879f' }}>

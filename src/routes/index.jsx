@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import Home from "../pages/Home";
 import Catalog from "../pages/Catalog";
 import Saved from "../pages/Saved";
@@ -11,6 +11,8 @@ import Login from "../pages/Login";
 import GoogleCallback from "../pages/GoogleCallback";
 import AdminApp from "../admin/AdminApp";
 
+const isAdminLoggedIn = () => !!localStorage.getItem('admin_token');
+
 const AppRoutes = () => {
   return (
     <Routes>
@@ -20,7 +22,7 @@ const AppRoutes = () => {
       <Route path="/saved" element={<Saved />} />
       <Route path="/profile" element={<Profile />} />
       <Route path="/register" element={<Register />} />
-      <Route path="/login" element={<Login />} />
+      <Route path="/login" element={isAdminLoggedIn() ? <Navigate to="/admin" replace /> : <Login />} />
       <Route path="/verify-otp" element={<VerifyOTP />} />
       <Route path="/auth/google/callback" element={<GoogleCallback />} />
       <Route path="/admin" element={<AdminApp />} />

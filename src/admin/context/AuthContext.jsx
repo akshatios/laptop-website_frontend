@@ -14,6 +14,7 @@ export default function AuthProvider({ children }) {
   const logout = useCallback(() => {
     localStorage.removeItem('admin_token');
     setToken(null);
+    window.location.href = '/login';
   }, []);
 
   return (
